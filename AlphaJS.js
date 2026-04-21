@@ -1,33 +1,44 @@
 (function() {
 
-  // لو المستخدم عمل Alpha خده
   let Alpha = window.Alpha || {}
-
-  // ولو مش مربوط بالـ window اربطه
   window.Alpha = Alpha
 
-  Alpha.components = Alpha.components || {}
+  // components
+  Alpha.components = {}
 
-  Alpha.component = (name, fn) => Alpha.components[name] = fn
-
-  Alpha.parse = (template) => {
-    return template.replace(/~(.*?)~/g, (_, key) => {
-      return Alpha.state[key] || ""
-    })
+  Alpha.component = (name, fn) => {
+    Alpha.components[name] = fn
   }
 
-  Alpha.state = Alpha.state || new Proxy({}, {
-    set(obj, key, value) {
-      obj[key] = value
-      Alpha.render()
-      return true
+  // data (reactive)
+  Object.defineProperty(Alpha, "data", {
+    set(value) {
+      Alpha._data = new Proxy(value, {
+        set(obj, key, val) {
+          obj[key] = val
+          Alpha.render()
+          return true
+        }
+      })
+    },
+    get() {
+      return Alpha._data
     }
   })
 
+  // template parser
+  Alpha.parse = (template) => {
+    return template.replace(/~(.*?)~/g, (_, key) => {
+      return Alpha.data?.[key] ?? ""
+    })
+  }
+
+  // render
   Alpha.render = () => {
     document.querySelectorAll("[alpha]").forEach(el => {
       const name = el.getAttribute("alpha")
-      el.innerHTML = Alpha.parse(Alpha.components[name]?.() || "")
+      const comp = Alpha.components[name]
+      el.innerHTML = Alpha.parse(comp?.() || "")
     })
   }
 
