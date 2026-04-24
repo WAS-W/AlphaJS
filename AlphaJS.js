@@ -37,19 +37,19 @@
   }
   
   const app = document.querySelector('body');
-
+  
   document.addEventListener("click", (e) => {
     const el = e.target.closest("[link]");
     if (!el) return;
-
+    
     e.preventDefault();
-
+    
     const path = el.getAttribute("href"); // 👈 مفيش URL ولا حاجة
-
+    
     history.pushState(null, "", path);
-
+    
     const page = Alpha.routes[path];
-
+    
     if (page) {
       app.innerHTML = page();
       Alpha.render();
@@ -57,21 +57,21 @@
   });
   
   document.addEventListener('click', (e) => {
-  let el = e.target
-  
-  while (el && el !== document) {
-    if (el.hasAttribute && el.hasAttribute('$click')) {
-      const code = el.getAttribute('$click')
-      
-      new Function(
-        "Alpha",
-        `with(Alpha.state){ ${code} }`
-      )(Alpha)
-      break
+    let el = e.target
+    
+    while (el && el !== document) {
+      if (el.hasAttribute && el.hasAttribute('$click')) {
+        const code = el.getAttribute('$click')
+        
+        new Function(
+          "Alpha",
+          `with(Alpha.state){ ${code} }`
+        )(Alpha)
+        break
+      }
+      el = el.parentElement
     }
-    el = el.parentElement
-  }
-})
+  })
   
   
   // 🚀 Render
@@ -125,12 +125,4 @@
   }
   
   
-})()  Alpha.render = () => {
-    document.querySelectorAll("[alpha]").forEach(el => {
-      const name = el.getAttribute("alpha")
-      const comp = Alpha.components[name]
-      el.innerHTML = Alpha.parse(comp?.() || "")
-    })
-  }
-
-})()
+})() 
