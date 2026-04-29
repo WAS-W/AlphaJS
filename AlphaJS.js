@@ -37,24 +37,33 @@
   }
   
   const app = document.querySelector('body');
-  
-  document.addEventListener("click", (e) => {
-    const el = e.target.closest("[link]");
-    if (!el) return;
-    
-    e.preventDefault();
-    
-    const path = el.getAttribute("href"); // 👈 مفيش URL ولا حاجة
-    
-    history.pushState(null, "", path);
-    
-    const page = Alpha.routes[path];
-    
-    if (page) {
-      app.innerHTML = page();
-      Alpha.render();
-    }
-  });
+
+function renderByHash() {
+  const path = window.location.hash.slice(1) || '/'; // بيقرا #/projects ويشيل الـ #
+  const page = Alpha.routes[path];
+
+  if (page) {
+    app.innerHTML = page();
+    Alpha.render();
+  }
+}
+
+// 1. لما تدوس على لينك
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[link]");
+  if (!el) return;
+
+  e.preventDefault();
+  const path = el.getAttribute("href");
+  location.hash = path; // بس كده
+});
+
+// 2. لما الهاش يتغير من زرار الرجوع أو تكتب اللينك بإيدك
+window.addEventListener('hashchange', renderByHash);
+
+// 3. أول ما الصفحة تفتح
+window.addEventListener('load', renderByHash);
+renderByHash();
   
   document.addEventListener('click', (e) => {
     let el = e.target
